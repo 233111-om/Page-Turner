@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cart | PageTurner Books</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+--ink:#1a1208;
+--parchment:#f5f0e8;
+--cream:#fdf8f0;
+--amber:#c8782a;
+--amber-dark:#9a5a18;
+--muted:#8a7a65;
+--card:#fff9f0;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh;}
+nav{
+background:var(--ink);
+padding:18px 40px;
+display:flex;align-items:center;justify-content:space-between;
+}
+.logo{font-family:'Playfair Display',serif;color:var(--parchment);font-size:1.5rem;letter-spacing:1px;}
+.logo span{color:var(--amber);font-style:italic;}
+nav a{color:var(--parchment);text-decoration:none;font-size:.85rem;font-weight:500;opacity:.8;transition:.2s;}
+nav a:hover{opacity:1;color:var(--amber);}
+
+.page-header{
+padding:48px 40px 24px;
+background:linear-gradient(to bottom,var(--parchment),var(--cream));
+border-bottom:1px solid #e8dcc8;
+}
+.page-header h1{font-family:'Playfair Display',serif;font-size:2.6rem;}
+.page-header p{color:var(--muted);font-size:.9rem;margin-top:6px;}
+
+.main{
+display:grid;
+grid-template-columns:1fr 320px;
+gap:32px;
+max-width:1100px;
+margin:40px auto;
+padding:0 40px;
+align-items:start;
+}
+@media(max-width:768px){.main{grid-template-columns:1fr;}}
+
+.cart-items{display:flex;flex-direction:column;gap:16px;}
+.empty-state{
+text-align:center;padding:80px 20px;
+color:var(--muted);
+}
+.empty-state .icon{font-size:3rem;margin-bottom:16px;}
+.empty-state h2{font-family:'Playfair Display',serif;margin-bottom:10px;color:var(--ink);}
+.empty-state a{
+display:inline-block;margin-top:20px;
+background:var(--ink);color:var(--parchment);
+padding:11px 28px;border-radius:2px;text-decoration:none;
+font-size:.85rem;letter-spacing:.4px;
+}
+.empty-state a:hover{background:var(--amber);}
+
+.cart-item{
+background:var(--card);
+border:1px solid #e8dcc8;
+border-radius:4px;
+display:flex;gap:16px;
+padding:16px;
+align-items:center;
+transition:.2s;
+}
+.cart-item:hover{box-shadow:0 4px 16px rgba(26,18,8,.08);}
+.item-img{
+width:72px;height:96px;object-fit:cover;
+border-radius:2px;flex-shrink:0;
+}
+.item-info{flex:1;}
+.item-genre{font-size:.7rem;color:var(--amber);font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;}
+.item-name{font-family:'Playfair Display',serif;font-size:1rem;margin-bottom:3px;}
+.item-author{font-size:.8rem;color:var(--muted);}
+.item-price{font-weight:500;font-size:1rem;color:var(--ink);margin-top:8px;}
+.remove-btn{
+background:transparent;border:1.5px solid #e8dcc8;
+color:var(--muted);padding:7px 14px;border-radius:2px;
+font-family:'DM Sans',sans-serif;font-size:.78rem;
+cursor:pointer;transition:.2s;flex-shrink:0;
+}
+.remove-btn:hover{background:#fde8e8;border-color:#e8a0a0;color:#c0392b;}
+
+.summary{
+background:var(--card);
+border:1px solid #e8dcc8;
+border-radius:4px;
+padding:24px;
+position:sticky;top:20px;
+}
+.summary h2{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid #e8dcc8;}
+.summary-row{
+display:flex;justify-content:space-between;
+font-size:.875rem;margin-bottom:12px;color:var(--muted);
+}
+.summary-row.total{
+font-size:1.05rem;font-weight:500;color:var(--ink);
+padding-top:14px;margin-top:6px;border-top:1px solid #e8dcc8;
+}
+.checkout-btn{
+width:100%;background:var(--amber);color:#fff;
+border:none;padding:14px;border-radius:2px;
+font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;
+cursor:pointer;transition:.2s;margin-top:20px;letter-spacing:.4px;
+}
+.checkout-btn:hover{background:var(--amber-dark);}
+.checkout-btn:disabled{background:#ccc;cursor:not-allowed;}
+.continue-link{
+display:block;text-align:center;margin-top:14px;
+font-size:.8rem;color:var(--muted);text-decoration:none;
+}
+.continue-link:hover{color:var(--amber);}
+
+.modal-overlay{
+position:fixed;inset:0;background:rgba(26,18,8,.5);
+display:none;align-items:center;justify-content:center;z-index:300;
+}
+.modal-overlay.show{display:flex;}
+.modal{
+background:var(--cream);border-radius:4px;padding:40px;
+text-align:center;max-width:360px;width:90%;
+border-top:4px solid var(--amber);
+}
+.modal .tick{font-size:2.5rem;margin-bottom:12px;}
+.modal h2{font-family:'Playfair Display',serif;font-size:1.5rem;margin-bottom:8px;}
+.modal p{color:var(--muted);font-size:.88rem;margin-bottom:24px;}
+.modal button{
+background:var(--ink);color:var(--parchment);border:none;
+padding:11px 28px;border-radius:2px;cursor:pointer;font-size:.85rem;
+}
+footer{background:var(--ink);color:var(--muted);text-align:center;padding:20px;font-size:.8rem;margin-top:60px;}
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Page<span>Turner</span></div>
+  <div style="display:flex;gap:24px;">
+    <a href="products.html">← Back to Books</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Your Cart</h1>
+  <p id="item-count-label">Loading...</p>
+</div>
+
+<div class="main">
+  <div class="cart-items" id="cart-items"></div>
+  <div class="summary">
+    <h2>Order Summary</h2>
+    <div class="summary-row"><span>Items</span><span id="s-items">0</span></div>
+    <div class="summary-row"><span>Delivery</span><span>FREE</span></div>
+    <div class="summary-row total"><span>Total</span><span>₹<span id="s-total">0</span></span></div>
+    <button class="checkout-btn" id="checkout-btn" onclick="checkout()" disabled>Place Order</button>
+    <a class="continue-link" href="products.html">Continue Shopping</a>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="tick">✅</div>
+    <h2>Order Placed!</h2>
+    <p>Thank you for your purchase. Your books will arrive within 3–5 business days.</p>
+    <button onclick="closeModal()">Browse More Books</button>
+  </div>
+</div>
+
+<footer><p>© PageTurner Books — Est. 2024 · Stories worth keeping</p></footer>
+
+<script>
+let cart=JSON.parse(localStorage.getItem("ptCart"))||[];
+
+function render(){
+  const c=document.getElementById("cart-items");
+  c.innerHTML="";
+  if(cart.length===0){
+    c.innerHTML=`<div class="empty-state">
+      <div class="icon">📚</div>
+      <h2>Your shelf is empty</h2>
+      <p>Add some books to get started.</p>
+      <a href="products.html">Browse Books</a>
+    </div>`;
+    document.getElementById("item-count-label").innerText="No items in cart";
+    document.getElementById("s-items").innerText=0;
+    document.getElementById("s-total").innerText=0;
+    document.getElementById("checkout-btn").disabled=true;
+    return;
+  }
+  let total=0;
+  cart.forEach((b,i)=>{
+    total+=b.price;
+    c.innerHTML+=`<div class="cart-item">
+      <img class="item-img" src="${b.img}" alt="${b.name}" onerror="this.src='https://via.placeholder.com/72x96/f5f0e8/c8782a?text=📖'">
+      <div class="item-info">
+        <div class="item-name">${b.name}</div>
+        <div class="item-author">${b.author}</div>
+        <div class="item-price">₹${b.price}</div>
+      </div>
+      <button class="remove-btn" onclick="remove(${i})">Remove</button>
+    </div>`;
+  });
+  document.getElementById("item-count-label").innerText=`${cart.length} item${cart.length>1?'s':''} in your cart`;
+  document.getElementById("s-items").innerText=cart.length;
+  document.getElementById("s-total").innerText=total;
+  document.getElementById("checkout-btn").disabled=false;
+}
+
+function remove(i){
+  cart.splice(i,1);
+  localStorage.setItem("ptCart",JSON.stringify(cart));
+  render();
+}
+
+function checkout(){
+  localStorage.setItem("ptCart","[]");
+  cart=[];
+  document.getElementById("modal").classList.add("show");
+  render();
+}
+
+function closeModal(){
+  document.getElementById("modal").classList.remove("show");
+  window.location.href="products.html";
+}
+
+render();
+</script>
+</body>
+</html>
